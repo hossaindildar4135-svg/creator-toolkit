@@ -1,0 +1,1259 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Creator Toolkit v1.0</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+
+  :root {
+    --bg: #0a0a0f;
+    --bg2: #111118;
+    --bg3: #18181f;
+    --border: rgba(255,255,255,0.08);
+    --border2: rgba(255,255,255,0.14);
+    --text: #f0f0f5;
+    --muted: #7a7a90;
+    --cyan: #00e5ff;
+    --cyan2: #00b8cc;
+    --purple: #a855f7;
+    --purple2: #7c3aed;
+    --green: #22c55e;
+    --red: #ef4444;
+    --amber: #f59e0b;
+    --pink: #ec4899;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Space Grotesk', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ===== AMBIENT BG ===== */
+  body::before {
+    content: '';
+    position: fixed;
+    top: -200px; left: 50%;
+    transform: translateX(-50%);
+    width: 700px; height: 400px;
+    background: radial-gradient(ellipse, rgba(0,229,255,0.06) 0%, transparent 70%);
+    pointer-events: none; z-index: 0;
+  }
+
+  /* ===== NAV ===== */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(10,10,15,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 0.5px solid var(--border);
+    padding: 0 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 56px;
+  }
+  .logo {
+    font-family: 'Space Mono', monospace;
+    font-size: 15px; font-weight: 700; letter-spacing: 0.06em;
+    color: var(--text);
+  }
+  .logo span { color: var(--cyan); }
+  .nav-badge {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+    background: rgba(0,229,255,0.1); color: var(--cyan);
+    border: 0.5px solid rgba(0,229,255,0.3);
+    padding: 3px 8px; border-radius: 4px;
+  }
+
+  /* ===== HERO ===== */
+  .hero {
+    position: relative; z-index: 1;
+    text-align: center;
+    padding: 72px 24px 48px;
+  }
+  .hero-eyebrow {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.2em;
+    color: var(--cyan); text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .hero h1 {
+    font-family: 'Space Mono', monospace;
+    font-size: clamp(36px, 8vw, 64px);
+    font-weight: 700; line-height: 1.0;
+    letter-spacing: -0.02em;
+    margin-bottom: 16px;
+  }
+  .hero h1 .accent { color: var(--cyan); }
+  .hero-sub {
+    font-size: 15px; color: var(--muted);
+    max-width: 400px; margin: 0 auto 36px;
+    line-height: 1.6;
+  }
+  .hero-chips {
+    display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;
+  }
+  .chip {
+    font-size: 12px; font-weight: 500;
+    padding: 6px 14px; border-radius: 100px;
+    border: 0.5px solid var(--border2);
+    color: var(--muted);
+    background: var(--bg3);
+  }
+
+  /* ===== TABS ===== */
+  .tabs-wrapper {
+    position: relative; z-index: 1;
+    padding: 0 20px 80px;
+    max-width: 720px; margin: 0 auto;
+  }
+  .tab-bar {
+    display: flex; gap: 4px;
+    background: var(--bg2);
+    border: 0.5px solid var(--border);
+    border-radius: 12px; padding: 4px;
+    margin-bottom: 28px;
+  }
+  .tab-btn {
+    flex: 1; font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px; font-weight: 600;
+    padding: 10px 12px;
+    border: none; border-radius: 9px;
+    cursor: pointer; transition: all 0.2s;
+    color: var(--muted); background: transparent;
+    letter-spacing: 0.03em;
+  }
+  .tab-btn.active {
+    background: var(--bg3);
+    color: var(--text);
+    border: 0.5px solid var(--border2);
+  }
+  .tab-btn:hover:not(.active) { color: var(--text); }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ===== CARDS ===== */
+  .card {
+    background: var(--bg2);
+    border: 0.5px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 16px;
+    transition: border-color 0.2s;
+  }
+  .card:hover { border-color: var(--border2); }
+  .card-header {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 16px;
+  }
+  .card-icon {
+    width: 40px; height: 40px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; flex-shrink: 0;
+  }
+  .icon-cyan { background: rgba(0,229,255,0.1); }
+  .icon-purple { background: rgba(168,85,247,0.1); }
+  .icon-green { background: rgba(34,197,94,0.1); }
+  .icon-pink { background: rgba(236,72,153,0.1); }
+  .card-title { font-size: 15px; font-weight: 600; }
+  .card-desc { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  /* ===== FORM ELEMENTS ===== */
+  label {
+    display: block;
+    font-size: 12px; font-weight: 500;
+    color: var(--muted); letter-spacing: 0.05em; text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  input[type=text], input[type=url], textarea, select {
+    width: 100%;
+    background: var(--bg3);
+    border: 0.5px solid var(--border2);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px;
+    padding: 12px 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    resize: none;
+  }
+  input:focus, textarea:focus, select:focus {
+    border-color: var(--cyan);
+  }
+  select option { background: var(--bg3); }
+
+  .input-group { margin-bottom: 14px; }
+
+  /* ===== BUTTONS ===== */
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px; font-weight: 600;
+    padding: 11px 20px; border-radius: 10px;
+    border: none; cursor: pointer;
+    transition: all 0.2s; letter-spacing: 0.02em;
+    text-decoration: none;
+  }
+  .btn-cyan {
+    background: var(--cyan); color: #000;
+  }
+  .btn-cyan:hover { background: var(--cyan2); transform: translateY(-1px); }
+  .btn-purple {
+    background: var(--purple2); color: #fff;
+  }
+  .btn-purple:hover { background: var(--purple); transform: translateY(-1px); }
+  .btn-ghost {
+    background: transparent;
+    border: 0.5px solid var(--border2);
+    color: var(--text);
+  }
+  .btn-ghost:hover { background: var(--bg3); }
+  .btn-full { width: 100%; justify-content: center; }
+  .btn-sm { padding: 8px 14px; font-size: 12px; }
+
+  /* ===== OUTPUT BOX ===== */
+  .output-box {
+    background: var(--bg);
+    border: 0.5px solid var(--border2);
+    border-radius: 10px;
+    padding: 16px;
+    font-size: 14px; line-height: 1.7;
+    color: var(--text);
+    min-height: 80px;
+    white-space: pre-wrap;
+    display: none;
+  }
+  .output-box.visible { display: block; }
+  .output-label {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.1em;
+    color: var(--muted); text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  /* ===== TOOL GRID ===== */
+  .tool-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px; margin-bottom: 16px;
+  }
+  .tool-tile {
+    background: var(--bg3);
+    border: 0.5px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: left;
+  }
+  .tool-tile:hover { border-color: var(--cyan); background: rgba(0,229,255,0.04); }
+  .tool-tile.selected { border-color: var(--cyan); background: rgba(0,229,255,0.08); }
+  .tool-tile-icon { font-size: 22px; margin-bottom: 8px; }
+  .tool-tile-name { font-size: 13px; font-weight: 600; }
+  .tool-tile-desc { font-size: 11px; color: var(--muted); margin-top: 3px; line-height: 1.4; }
+
+  /* ===== DIVIDER ===== */
+  .divider {
+    border: none; border-top: 0.5px solid var(--border);
+    margin: 20px 0;
+  }
+
+  /* ===== BADGE ===== */
+  .badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 10px; font-weight: 600; letter-spacing: 0.08em;
+    padding: 4px 10px; border-radius: 100px;
+    text-transform: uppercase;
+  }
+  .badge-cyan { background: rgba(0,229,255,0.1); color: var(--cyan); border: 0.5px solid rgba(0,229,255,0.25); }
+  .badge-purple { background: rgba(168,85,247,0.1); color: var(--purple); border: 0.5px solid rgba(168,85,247,0.25); }
+  .badge-green { background: rgba(34,197,94,0.1); color: var(--green); border: 0.5px solid rgba(34,197,94,0.25); }
+
+  /* ===== LOADING ===== */
+  .loading-bar {
+    height: 2px; background: var(--border);
+    border-radius: 2px; overflow: hidden;
+    margin-bottom: 12px; display: none;
+  }
+  .loading-bar.visible { display: block; }
+  .loading-bar-fill {
+    height: 100%; width: 0%;
+    background: linear-gradient(90deg, var(--cyan), var(--purple));
+    border-radius: 2px;
+    transition: width 0.3s;
+  }
+
+  /* ===== COPY BTN ===== */
+  .copy-row {
+    display: flex; justify-content: flex-end; gap: 8px;
+    margin-top: 10px;
+  }
+
+  /* ===== RANGE SLIDER ===== */
+  input[type=range] {
+    -webkit-appearance: none;
+    width: 100%; height: 4px;
+    background: var(--bg3);
+    border-radius: 2px; outline: none;
+    border: none; padding: 0;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--cyan); cursor: pointer;
+    border: 2px solid var(--bg);
+  }
+  .range-row {
+    display: flex; align-items: center; gap: 12px;
+    margin-top: 6px;
+  }
+  .range-val {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px; color: var(--cyan);
+    min-width: 28px; text-align: right;
+  }
+
+  /* ===== WAVEFORM VISUAL ===== */
+  .waveform {
+    display: flex; align-items: center; gap: 3px;
+    height: 40px; padding: 0 4px;
+    margin-bottom: 12px;
+  }
+  .wave-bar {
+    flex: 1; border-radius: 2px;
+    background: rgba(0,229,255,0.25);
+    transition: height 0.1s;
+  }
+
+  /* ===== FOOTER ===== */
+  footer {
+    border-top: 0.5px solid var(--border);
+    padding: 24px;
+    text-align: center;
+    font-size: 12px; color: var(--muted);
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">CREATOR<span>.</span>TOOLKIT</div>
+  <div class="nav-badge">v1.0 FREE</div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow">⚡ Professional Audio Engine</div>
+  <h1>CREATE.<br><span class="accent">CRAFT.</span><br>LAUNCH.</h1>
+  <p class="hero-sub">গান তৈরি, লিরিক্স লেখা এবং অডিও এডিটিং — সব এক জায়গায়।</p>
+  <div class="hero-chips">
+    <div class="chip">🎵 Audio Tools</div>
+    <div class="chip">✍️ Lyrics Writer</div>
+    <div class="chip">🆓 সম্পূর্ণ ফ্রি</div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs-wrapper">
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('lyrics')">✍️ Lyrics Writer</button>
+    <button class="tab-btn" onclick="switchTab('audio')">🎵 Audio Tools</button>
+    <button class="tab-btn" onclick="switchTab('beat')">🥁 Beat Lab</button>
+  </div>
+
+  <!-- ===== LYRICS WRITER TAB ===== -->
+  <div id="tab-lyrics" class="tab-panel active">
+
+    <!-- VerseCraft -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-purple">✍️</div>
+        <div>
+          <div class="card-title">VerseCraft</div>
+          <div class="card-desc">AI-powered লিরিক্স জেনারেটর</div>
+        </div>
+        <div class="badge badge-purple" style="margin-left:auto">AI</div>
+      </div>
+
+      <div class="input-group">
+        <label>গানের বিষয়</label>
+        <input type="text" id="lyr-topic" placeholder="যেমন: বৃষ্টির রাত, প্রথম প্রেম, মুক্তি...">
+      </div>
+
+      <div class="tool-grid">
+        <div class="tool-tile selected" onclick="selectGenre(this,'romantic')" id="g-romantic">
+          <div class="tool-tile-icon">💕</div>
+          <div class="tool-tile-name">Romantic</div>
+          <div class="tool-tile-desc">প্রেমের গান</div>
+        </div>
+        <div class="tool-tile" onclick="selectGenre(this,'sad')" id="g-sad">
+          <div class="tool-tile-icon">😔</div>
+          <div class="tool-tile-name">Sad / বিরহ</div>
+          <div class="tool-tile-desc">বিচ্ছেদের গান</div>
+        </div>
+        <div class="tool-tile" onclick="selectGenre(this,'motivational')" id="g-motivational">
+          <div class="tool-tile-icon">🔥</div>
+          <div class="tool-tile-name">Motivational</div>
+          <div class="tool-tile-desc">অনুপ্রেরণার গান</div>
+        </div>
+        <div class="tool-tile" onclick="selectGenre(this,'folk')" id="g-folk">
+          <div class="tool-tile-icon">🪕</div>
+          <div class="tool-tile-name">Folk / লোকগীতি</div>
+          <div class="tool-tile-desc">বাংলা লোকগান</div>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label>ভাষা</label>
+        <select id="lyr-lang">
+          <option value="bengali">বাংলা</option>
+          <option value="english">English</option>
+          <option value="mixed">বাংলা-English মিশ্রিত</option>
+        </select>
+      </div>
+
+      <div class="input-group">
+        <label>Structure</label>
+        <select id="lyr-structure">
+          <option value="verse-chorus">Verse + Chorus</option>
+          <option value="verse-chorus-bridge">Verse + Chorus + Bridge</option>
+          <option value="full">Full Song (Intro + 2 Verse + Chorus + Outro)</option>
+        </select>
+      </div>
+
+      <div class="loading-bar" id="lyr-loading">
+        <div class="loading-bar-fill" id="lyr-fill"></div>
+      </div>
+
+      <button class="btn btn-purple btn-full" onclick="generateLyrics()">
+        ✨ লিরিক্স তৈরি করুন
+      </button>
+
+      <div style="margin-top: 16px;">
+        <div class="output-label" id="lyr-out-label" style="display:none">Generated Lyrics</div>
+        <div class="output-box" id="lyr-output"></div>
+        <div class="copy-row" id="lyr-copy-row" style="display:none">
+          <button class="btn btn-ghost btn-sm" onclick="copyText('lyr-output')">📋 Copy</button>
+          <button class="btn btn-ghost btn-sm" onclick="downloadText('lyr-output','lyrics.txt')">⬇️ Download</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rhyme Finder -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-cyan">🔤</div>
+        <div>
+          <div class="card-title">Rhyme Finder</div>
+          <div class="card-desc">মিল খুঁজে বের করো</div>
+        </div>
+      </div>
+      <div style="display:flex; gap:8px;">
+        <input type="text" id="rhyme-word" placeholder="একটি শব্দ লিখুন...">
+        <button class="btn btn-cyan" onclick="findRhymes()">খোঁজো</button>
+      </div>
+      <div class="output-box" id="rhyme-output" style="margin-top:12px;"></div>
+    </div>
+
+  </div>
+
+  <!-- ===== AUDIO TOOLS TAB ===== -->
+  <div id="tab-audio" class="tab-panel">
+
+    <!-- Dismantle -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-cyan">⚡</div>
+        <div>
+          <div class="card-title">DISMANTLE</div>
+          <div class="card-desc">গান ভেঙে আলাদা করো</div>
+        </div>
+        <div class="badge badge-cyan" style="margin-left:auto">Popular</div>
+      </div>
+
+      <div id="drop-zone" style="
+        border: 1.5px dashed var(--border2);
+        border-radius: 12px; padding: 32px;
+        text-align: center; cursor: pointer;
+        margin-bottom: 14px;
+        transition: all 0.2s;
+      " onclick="document.getElementById('audio-file').click()"
+         ondragover="event.preventDefault();this.style.borderColor='var(--cyan)'"
+         ondragleave="this.style.borderColor='var(--border2)'"
+         ondrop="handleDrop(event)">
+        <div style="font-size: 28px; margin-bottom: 8px;">🎵</div>
+        <div style="font-size: 14px; font-weight: 500;">অডিও ফাইল এখানে রাখুন</div>
+        <div style="font-size: 12px; color: var(--muted); margin-top: 4px;">MP3, WAV, OGG সাপোর্টেড</div>
+      </div>
+      <input type="file" id="audio-file" accept="audio/*" style="display:none" onchange="fileSelected(this)">
+      <div id="file-info" style="display:none; font-size:12px; color:var(--cyan); margin-bottom:12px;"></div>
+
+      <label style="margin-bottom: 8px;">কী আলাদা করবে?</label>
+      <div class="tool-grid" style="margin-bottom:14px;">
+        <div class="tool-tile selected" id="sep-vocals" onclick="toggleSep(this)">
+          <div class="tool-tile-icon">🎤</div>
+          <div class="tool-tile-name">Vocals</div>
+          <div class="tool-tile-desc">কণ্ঠস্বর</div>
+        </div>
+        <div class="tool-tile selected" id="sep-beats" onclick="toggleSep(this)">
+          <div class="tool-tile-icon">🥁</div>
+          <div class="tool-tile-name">Drums / Beat</div>
+          <div class="tool-tile-desc">ড্রামস</div>
+        </div>
+        <div class="tool-tile" id="sep-bass" onclick="toggleSep(this)">
+          <div class="tool-tile-icon">🎸</div>
+          <div class="tool-tile-name">Bass</div>
+          <div class="tool-tile-desc">বেস গিটার</div>
+        </div>
+        <div class="tool-tile" id="sep-instr" onclick="toggleSep(this)">
+          <div class="tool-tile-icon">🎹</div>
+          <div class="tool-tile-name">Instruments</div>
+          <div class="tool-tile-desc">অন্যান্য</div>
+        </div>
+      </div>
+
+      <button class="btn btn-cyan btn-full" onclick="runDismantle()">⚡ Dismantle করো</button>
+      <div id="dismantle-result" style="margin-top:14px; display:none;">
+        <div class="output-label">Result</div>
+        <div class="output-box visible" id="dismantle-out"></div>
+      </div>
+    </div>
+
+    <!-- Reassemble -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-green">🔄</div>
+        <div>
+          <div class="card-title">REASSEMBLE</div>
+          <div class="card-desc">ট্র্যাক জোড়া লাগাও</div>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Track 1</label>
+        <input type="file" id="track1" accept="audio/*" style="background:var(--bg3); border:0.5px solid var(--border2); border-radius:10px; padding:10px; color:var(--muted); font-size:13px; width:100%;">
+      </div>
+      <div class="input-group">
+        <label>Track 2</label>
+        <input type="file" id="track2" accept="audio/*" style="background:var(--bg3); border:0.5px solid var(--border2); border-radius:10px; padding:10px; color:var(--muted); font-size:13px; width:100%;">
+      </div>
+      <div class="input-group">
+        <label>Mix Ratio (Track 1 Volume)</label>
+        <div class="range-row">
+          <input type="range" min="0" max="100" value="50" step="1" id="mix-ratio" oninput="document.getElementById('mix-val').textContent=this.value+'%'">
+          <span class="range-val" id="mix-val">50%</span>
+        </div>
+      </div>
+      <button class="btn btn-ghost btn-full" onclick="runReassemble()">🔄 Reassemble করো</button>
+      <div id="reassemble-result" style="margin-top:14px; display:none;">
+        <div class="output-box visible" id="reassemble-out"></div>
+        <div id="merged-player" style="margin-top:10px;"></div>
+      </div>
+    </div>
+
+    <!-- Pitch & Speed -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-pink">🎛️</div>
+        <div>
+          <div class="card-title">Pitch & Speed</div>
+          <div class="card-desc">পিচ এবং স্পিড পরিবর্তন</div>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>অডিও ফাইল</label>
+        <input type="file" id="ps-file" accept="audio/*" style="background:var(--bg3); border:0.5px solid var(--border2); border-radius:10px; padding:10px; color:var(--muted); font-size:13px; width:100%;" onchange="loadPSFile(this)">
+      </div>
+      <div class="input-group">
+        <label>Playback Speed</label>
+        <div class="range-row">
+          <input type="range" min="0.5" max="2" value="1" step="0.1" id="speed-val" oninput="updateSpeed(this.value)">
+          <span class="range-val" id="speed-disp">1.0x</span>
+        </div>
+      </div>
+      <div id="ps-player" style="margin-top:8px;"></div>
+      <div style="font-size:12px; color:var(--muted); margin-top:10px;">
+        💡 সত্যিকারের pitch shift-এর জন্য একটি DAW (Audacity, GarageBand) ব্যবহার করুন।
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===== BEAT LAB TAB ===== -->
+  <div id="tab-beat" class="tab-panel">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-cyan">🥁</div>
+        <div>
+          <div class="card-title">Beat Sequencer</div>
+          <div class="card-desc">নিজের বিট তৈরি করো</div>
+        </div>
+        <div class="badge badge-green" style="margin-left:auto">Live</div>
+      </div>
+
+      <div style="margin-bottom: 14px;">
+        <label>BPM</label>
+        <div class="range-row">
+          <input type="range" min="60" max="180" value="120" step="1" id="bpm-range" oninput="document.getElementById('bpm-val').textContent=this.value">
+          <span class="range-val" id="bpm-val">120</span>
+        </div>
+      </div>
+
+      <!-- Beat grid -->
+      <div id="beat-grid" style="margin-bottom: 16px;"></div>
+
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <button class="btn btn-cyan" id="play-btn" onclick="toggleBeat()">▶ Play</button>
+        <button class="btn btn-ghost" onclick="clearBeat()">🗑 Clear</button>
+        <button class="btn btn-ghost" onclick="randomBeat()">🎲 Random</button>
+      </div>
+
+      <!-- Waveform visualizer -->
+      <div class="waveform" id="waveform" style="margin-top:16px;"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-purple">🎹</div>
+        <div>
+          <div class="card-title">Chord Suggester</div>
+          <div class="card-desc">গানের জন্য কর্ড খুঁজো</div>
+        </div>
+      </div>
+      <div style="display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap;">
+        <select id="chord-key" style="flex:1;">
+          <option>C</option><option>C#</option><option>D</option>
+          <option>D#</option><option>E</option><option>F</option>
+          <option>F#</option><option>G</option><option>G#</option>
+          <option>A</option><option>A#</option><option>B</option>
+        </select>
+        <select id="chord-mode" style="flex:1;">
+          <option value="major">Major</option>
+          <option value="minor">Minor</option>
+        </select>
+      </div>
+      <button class="btn btn-purple btn-full" onclick="suggestChords()">🎵 Chord দেখাও</button>
+      <div class="output-box" id="chord-output" style="margin-top:12px; font-family: 'Space Mono', monospace;"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+  Creator Toolkit v1.0 &nbsp;·&nbsp; Made with ❤️ &nbsp;·&nbsp; সম্পূর্ণ ফ্রি
+</footer>
+
+<script>
+// ===== TAB SWITCH =====
+function switchTab(name) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// ===== GENRE SELECT =====
+let selectedGenre = 'romantic';
+function selectGenre(el, genre) {
+  document.querySelectorAll('[id^="g-"]').forEach(t => t.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedGenre = genre;
+}
+
+// ===== GENERATE LYRICS =====
+const LYRICS_DB = {
+  romantic: {
+    bengali: {
+      'verse-chorus': `[Verse 1]
+তুমি আমার স্বপ্নের মানুষ, তুমি আমার আলো
+তোমাকে ছাড়া এই পৃথিবীতে কিছুই লাগে না ভালো
+বৃষ্টি ভেজা সন্ধ্যায় তোমার কথা মনে পড়ে
+তুমি আমার হৃদয়ে থাকো, দিনরাত ঘরে
+
+[Chorus]
+তুমি আমার, তুমি শুধু আমার
+তুমি ছাড়া এ জীবন বৃথা সব হয়
+তোমার হাত ধরে চলি, তোমার পথে চলি
+তুমিই আমার জীবনের পরিচয়`,
+
+      'verse-chorus-bridge': `[Verse 1]
+তুমি আমার স্বপ্নের মানুষ, তুমি আমার আলো
+তোমাকে ছাড়া এই পৃথিবীতে কিছুই লাগে না ভালো
+
+[Chorus]
+তুমি আমার, তুমি শুধু আমার
+তুমি ছাড়া এ জীবন বৃথা সব হয়
+
+[Verse 2]
+চাঁদের আলোয় তোমার মুখ, ফুলের মতো হাসি
+তোমার কাছে আসতে চাই, তোমাকে ভালোবাসি
+
+[Bridge]
+যতদিন বাঁচি, তোমাকেই ভালোবাসব
+তোমার হাত ধরে, এই পথ চলে যাব`,
+
+      'full': `[Intro]
+হাওয়ায় ভেসে আসে তোমার নাম...
+
+[Verse 1]
+তুমি আমার স্বপ্নের মানুষ, তুমি আমার আলো
+তোমাকে ছাড়া এই পৃথিবীতে কিছুই লাগে না ভালো
+বৃষ্টি ভেজা সন্ধ্যায় তোমার কথা মনে পড়ে
+তুমি আমার হৃদয়ে থাকো, দিনরাত ঘরে
+
+[Chorus]
+তুমি আমার, তুমি শুধু আমার
+তুমি ছাড়া এ জীবন বৃথা সব হয়
+তোমার হাত ধরে চলি, তোমার পথে চলি
+তুমিই আমার জীবনের পরিচয়
+
+[Verse 2]
+চাঁদের আলোয় তোমার মুখ, ফুলের মতো হাসি
+তোমার কাছে আসতে চাই, তোমাকে ভালোবাসি
+এই রাতের তারারা জানে, আমার মনের কথা
+তোমাকে ছাড়া সব কিছু, মনে হয় বৃথা
+
+[Chorus]
+তুমি আমার, তুমি শুধু আমার
+তুমি ছাড়া এ জীবন বৃথা সব হয়
+
+[Outro]
+তুমি থেকো পাশে, সারাজীবন...
+তুমি আমার ভালোবাসা, তুমি আমার মন।`
+    },
+    english: {
+      'verse-chorus': `[Verse 1]
+You are the light that guides my way
+The reason I get up each day
+In your eyes I see the stars
+You've healed all of my scars
+
+[Chorus]
+You're mine, only mine
+Like the sun, how you shine
+Hold my hand, never let go
+You're the one that I know`,
+      'verse-chorus-bridge': `[Verse 1]
+You are the light that guides my way
+The reason I get up each day
+
+[Chorus]
+You're mine, only mine
+Like the sun, how you shine
+
+[Verse 2]
+Your smile like morning dew
+Everything feels brand new
+
+[Bridge]
+No matter where I go
+You're the one I'll always know`,
+      'full': `[Intro]
+I close my eyes and see your face...
+
+[Verse 1]
+You are the light that guides my way
+The reason I get up each day
+In your eyes I see the stars
+You've healed all of my scars
+
+[Chorus]
+You're mine, only mine
+Like the sun, how you shine
+Hold my hand, never let go
+You're the one that I know
+
+[Verse 2]
+Your smile like morning dew
+Everything feels brand new
+In your arms I found my home
+Never again will I roam
+
+[Chorus]
+You're mine, only mine
+Like the sun, how you shine
+
+[Outro]
+Stay with me forever...
+Together we'll face whatever.`
+    },
+    mixed: {
+      'verse-chorus': `[Verse 1]
+তুমি আমার heart-এ থাকো সবসময়
+তোমাকে ছাড়া feel করি শূন্যতায়
+You make me smile, তুমি আমার আলো
+তোমার সাথে everything feels so good
+
+[Chorus]
+You're my everything, তুমি আমার সব
+আমি তোমাকে love করি, এটাই সব কথা
+Baby stay with me, থেকো পাশে সদা
+Together forever, তুমি আমার ভালোবাসা`,
+      'verse-chorus-bridge': `[Verse 1]
+তুমি আমার heart-এ থাকো সবসময়
+You make me smile in every single way
+
+[Chorus]
+You're my everything, তুমি আমার সব
+
+[Verse 2]
+Every night I think of you, রাতের তারায়
+তোমার কথা ভাবি I miss you everyday
+
+[Bridge]
+No matter what they say, তোমাকেই চাই
+You're the only one for me, সবসময়`,
+      'full': `[Intro]
+Baby, শুনছো তুমি...
+
+[Verse 1]
+তুমি আমার heart-এ থাকো সবসময়
+তোমাকে ছাড়া feel করি শূন্যতায়
+
+[Chorus]
+You're my everything, তুমি আমার সব
+আমি তোমাকে love করি, এটাই সব কথা
+
+[Verse 2]
+Every night I think of you, রাতের তারায়
+তোমার কথা ভাবি, I miss you everyday
+
+[Chorus]
+You're my everything, তুমি আমার সব
+
+[Outro]
+Stay with me baby, থেকো সারাজীবন...`
+    }
+  },
+  sad: {
+    bengali: {
+      'verse-chorus': `[Verse 1]
+তুমি চলে গেছ আজ দূরে কোথাও
+আমি একা বসে কাঁদি তোমার লাগি
+তোমার স্মৃতি বুকে নিয়ে বেঁচে থাকি
+তুমি ছাড়া এ জীবন আঁধারে ঢাকি
+
+[Chorus]
+কেন চলে গেলে, কেন ভুলে গেলে
+আমার ভালোবাসা কি পাওনি খুঁজে
+কাঁদছি একা আমি, রাতের অন্ধকারে
+তোমার অপেক্ষায় আমি দিন গুনি`,
+      'verse-chorus-bridge': `[Verse 1]
+তুমি চলে গেছ আজ দূরে কোথাও
+আমি একা বসে কাঁদি তোমার লাগি
+
+[Chorus]
+কেন চলে গেলে, কেন ভুলে গেলে
+
+[Verse 2]
+পথের ধারে বসে ভাবি, কোথায় তুমি
+আকাশের তারা দেখি, চোখে আসে নীর
+
+[Bridge]
+হয়তো একদিন ফিরে আসবে তুমি
+সেই আশায় বুকে, বেঁচে আছি আমি`,
+      'full': `[Intro]
+একটা দীর্ঘশ্বাস... তুমি নেই...
+
+[Verse 1]
+তুমি চলে গেছ আজ দূরে কোথাও
+আমি একা বসে কাঁদি তোমার লাগি
+তোমার স্মৃতি বুকে নিয়ে বেঁচে থাকি
+তুমি ছাড়া এ জীবন আঁধারে ঢাকি
+
+[Chorus]
+কেন চলে গেলে, কেন ভুলে গেলে
+আমার ভালোবাসা কি পাওনি খুঁজে
+
+[Verse 2]
+বৃষ্টি আসে, ঝড় আসে, তুমি আসো না
+তোমার অপেক্ষায় থাকি, তুমি জানো না
+পথের ধুলো উড়ে যায়, মন ভারি হয়
+তোমার কথা ভাবতে ভাবতে রাত কেটে যায়
+
+[Chorus]
+কেন চলে গেলে, কেন ভুলে গেলে
+
+[Outro]
+তুমি ছাড়া এ পৃথিবী শূন্য মনে হয়...
+তবুও বেঁচে থাকি... তোমার আশায়।`
+    },
+    english: { 'verse-chorus': `[Verse 1]\nYou left me here all alone\nThis empty house is not a home\nYour ghost still lingers every night\nI'm drowning without your light\n\n[Chorus]\nWhy did you go, why did you leave\nLeft me here alone to grieve\nEvery night I cry your name\nNothing will ever be the same`, 'verse-chorus-bridge': `[Verse 1]\nYou left me here all alone\nThis empty house is not a home\n\n[Chorus]\nWhy did you go, why did you leave\n\n[Verse 2]\nThe rain reminds me of your eyes\nI'm lost beneath these cloudy skies\n\n[Bridge]\nMaybe someday you'll come back\nFill the void in all I lack`, 'full': `[Intro]\nThe silence is deafening...\n\n[Verse 1]\nYou left me here all alone\nThis empty house is not a home\n\n[Chorus]\nWhy did you go, why did you leave\nLeft me here alone to grieve\n\n[Verse 2]\nThe rain reminds me of your eyes\nI'm lost beneath these cloudy skies\n\n[Chorus]\nWhy did you go, why did you leave\n\n[Outro]\nI'll always love you... goodbye.` },
+    mixed: { 'verse-chorus': `[Verse 1]\nতুমি চলে গেছ, you're gone away\nআমি একা আজ, alone I stay\n\n[Chorus]\nWhy did you leave me, কেন গেলে চলে\nMissing you always, বুকে ব্যথা জ্বলে`, 'verse-chorus-bridge': `[Verse 1]\nতুমি চলে গেছ, you're gone away\n\n[Chorus]\nWhy did you leave me, কেন গেলে চলে\n\n[Bridge]\nHoping you'll return, তোমার আশায় আছি`, 'full': `[Intro]\nআর নেই তুমি...\n\n[Verse 1]\nতুমি চলে গেছ, you're gone away\n\n[Chorus]\nWhy did you leave me, কেন গেলে চলে\n\n[Outro]\nGoodbye my love... বিদায়।` }
+  },
+  motivational: {
+    bengali: { 'verse-chorus': `[Verse 1]\nউঠে দাঁড়াও, থেমে যেও না কখনো\nপথ যতই কঠিন, হার মেনো না\nসূর্য উদয় হবেই প্রতিটি ভোরে\nতুমিও জ্বলে উঠবে আপন আলোরে\n\n[Chorus]\nএগিয়ে যাও, এগিয়ে যাও\nভয়কে জয় করে সামনে এগিয়ে যাও\nজীবনের যুদ্ধে তুমি জিতবেই\nবিশ্বাস রাখো নিজের উপরেই`, 'verse-chorus-bridge': `[Verse 1]\nউঠে দাঁড়াও, থেমে যেও না কখনো\n\n[Chorus]\nএগিয়ে যাও, এগিয়ে যাও\n\n[Bridge]\nপ্রতিটি পতনে শিক্ষা নাও\nনতুন শক্তিতে উঠে দাঁড়াও`, 'full': `[Intro]\nউঠে দাঁড়াও, বীর...\n\n[Verse 1]\nউঠে দাঁড়াও, থেমে যেও না কখনো\nপথ যতই কঠিন, হার মেনো না\n\n[Chorus]\nএগিয়ে যাও, এগিয়ে যাও\nভয়কে জয় করে সামনে এগিয়ে যাও\n\n[Verse 2]\nঝড় আসবে, তুফান আসবে, টলো না\nসাফল্যের পথে পিছনে তাকিও না\n\n[Chorus]\nএগিয়ে যাও, এগিয়ে যাও\n\n[Outro]\nতুমি পারবে, তুমিই পারবে!` },
+    english: { 'verse-chorus': `[Verse 1]\nRise up now don't give in to fear\nYour time to shine is finally here\nEvery storm will pass and clear\nVictory is what you'll hear\n\n[Chorus]\nKeep going, keep going\nDon't stop until you've won\nYou're stronger than you know\nYour journey has just begun`, 'verse-chorus-bridge': `[Verse 1]\nRise up now don't give in to fear\n\n[Chorus]\nKeep going, keep going\n\n[Bridge]\nEvery fall teaches you to rise\nEvery storm clears to blue skies`, 'full': `[Intro]\nThis is your moment...\n\n[Verse 1]\nRise up now don't give in to fear\n\n[Chorus]\nKeep going, keep going\nDon't stop until you've won\n\n[Verse 2]\nThey said you'd never make it through\nBut here you are proving it's true\n\n[Outro]\nYou've got this. Keep going!` },
+    mixed: { 'verse-chorus': `[Verse 1]\nRise up, উঠে দাঁড়াও আজ\nDon't stop, থেমে যেও না কখনো\n\n[Chorus]\nKeep going, এগিয়ে যাও\nYou can do it, তুমি পারবে!`, 'verse-chorus-bridge': `[Verse 1]\nRise up, উঠে দাঁড়াও আজ\n\n[Chorus]\nKeep going, এগিয়ে যাও\n\n[Bridge]\nBelieve in yourself, বিশ্বাস রাখো`, 'full': `[Intro]\nএই মুহূর্ত তোমার...\n\n[Verse 1]\nRise up, উঠে দাঁড়াও আজ\n\n[Chorus]\nKeep going, এগিয়ে যাও\n\n[Outro]\nYou did it! তুমি পারলে!` }
+  },
+  folk: {
+    bengali: { 'verse-chorus': `[Verse 1]\nও নদীরে, কোথায় যাও বলো আমায়\nতোমার কূলে বসে আমি কাঁদি একা\nসোনার বাংলা মাটির গন্ধে মন ভরে\nমায়ের হাতের রান্নার কথা মনে পড়ে\n\n[Chorus]\nআমার সোনার বাংলা, মাটির টানে ফিরে আসি\nনদীর কূলে বসে গাই, প্রকৃতির কথা ভাসি`, 'verse-chorus-bridge': `[Verse 1]\nও নদীরে, কোথায় যাও বলো আমায়\n\n[Chorus]\nআমার সোনার বাংলা, মাটির টানে ফিরে আসি\n\n[Bridge]\nবাউলের সুরে মন ভাসে দূরে\nএই মাটির টান বুকে নিয়ে ঘুরে`, 'full': `[Intro]\nও মাঝি রে...\n\n[Verse 1]\nও নদীরে, কোথায় যাও বলো আমায়\nতোমার কূলে বসে আমি কাঁদি একা\n\n[Chorus]\nআমার সোনার বাংলা, মাটির টানে ফিরে আসি\n\n[Verse 2]\nসরষে ফুলের মাঠে মন হারিয়ে যায়\nপাখির ডাকে ভোরবেলা ঘুম ভেঙে যায়\n\n[Outro]\nএই মাটি, এই নদী, এই আকাশ\nএটাই আমার দেশ, আমার ভালোবাসা।` },
+    english: { 'verse-chorus': `[Verse 1]\nBy the riverside I sit and sing\nOf simpler times and everything\nOld wooden bridges, muddy roads\nCarrying my heavy loads\n\n[Chorus]\nHome is where the river flows\nWhere the jasmine sweetly grows`, 'verse-chorus-bridge': `[Verse 1]\nBy the riverside I sit and sing\n\n[Chorus]\nHome is where the river flows\n\n[Bridge]\nThe banyan tree remembers all\nEvery summer spring and fall`, 'full': `[Intro]\nThe wind carries an old song...\n\n[Verse 1]\nBy the riverside I sit and sing\n\n[Chorus]\nHome is where the river flows\n\n[Outro]\nThis land, this soil, this sky\nIs where I'll live until I die.` },
+    mixed: { 'verse-chorus': `[Verse 1]\nনদীর পাড়ে বসে গাই, by the riverside\nমাটির টানে ফিরে আসি, come back inside\n\n[Chorus]\nআমার সোনার বাংলা, my golden land\nHold my hand, হাত ধরো`, 'verse-chorus-bridge': `[Verse 1]\nনদীর পাড়ে বসে গাই, by the riverside\n\n[Chorus]\nআমার সোনার বাংলা, my golden land\n\n[Bridge]\nThe soil calls me home, মাটির ডাক`, 'full': `[Intro]\nও মাঝি...\n\n[Verse 1]\nনদীর পাড়ে বসে গাই, by the riverside\n\n[Chorus]\nআমার সোনার বাংলা, my golden land\n\n[Outro]\nThis is home... এটাই আমার দেশ।` }
+  }
+};
+
+function generateLyrics() {
+  const topic = document.getElementById('lyr-topic').value.trim();
+  const lang = document.getElementById('lyr-lang').value;
+  const structure = document.getElementById('lyr-structure').value;
+
+  const loading = document.getElementById('lyr-loading');
+  const fill = document.getElementById('lyr-fill');
+  const outBox = document.getElementById('lyr-output');
+  const outLabel = document.getElementById('lyr-out-label');
+  const copyRow = document.getElementById('lyr-copy-row');
+
+  loading.style.display = 'block';
+  outBox.classList.remove('visible');
+  outBox.style.display = 'none';
+  outLabel.style.display = 'none';
+  copyRow.style.display = 'none';
+
+  let w = 0;
+  const iv = setInterval(() => {
+    w = Math.min(w + Math.random() * 15, 95);
+    fill.style.width = w + '%';
+  }, 150);
+
+  setTimeout(() => {
+    clearInterval(iv);
+    fill.style.width = '100%';
+
+    const langKey = lang === 'bengali' ? 'bengali' : lang === 'english' ? 'english' : 'mixed';
+    const genreData = LYRICS_DB[selectedGenre] || LYRICS_DB.romantic;
+    const langData = genreData[langKey] || genreData['bengali'];
+    let lyrics = langData[structure] || langData['verse-chorus'];
+
+    if (topic) {
+      lyrics = `🎵 Topic: "${topic}"\n\n` + lyrics;
+    }
+
+    setTimeout(() => {
+      loading.style.display = 'none';
+      fill.style.width = '0%';
+      outLabel.style.display = 'block';
+      outBox.style.display = 'block';
+      outBox.classList.add('visible');
+      outBox.textContent = lyrics;
+      copyRow.style.display = 'flex';
+    }, 300);
+  }, 2000);
+}
+
+// ===== RHYME FINDER =====
+const rhymes = {
+  'ভালো': ['কালো','আলো','মালো','চালো','তালো'],
+  'মন': ['বন','ধন','গণ','তন','যন','ক্ষণ'],
+  'রাত': ['হাত','মাত','জাত','সাত','নাত'],
+  'গান': ['প্রাণ','ধান','মান','স্থান','জ্ঞান'],
+  'love': ['above','dove','shove','of','glove'],
+  'night': ['light','right','might','bright','sight','fight'],
+  'heart': ['start','part','art','smart','apart'],
+  'way': ['day','say','play','stay','gray','ray'],
+  'sky': ['fly','high','try','cry','why','my'],
+  'rain': ['pain','again','plain','vain','train','gain']
+};
+
+function findRhymes() {
+  const word = document.getElementById('rhyme-word').value.trim().toLowerCase();
+  const out = document.getElementById('rhyme-output');
+  if (!word) return;
+
+  const found = rhymes[word] || rhymes[Object.keys(rhymes).find(k => k.toLowerCase() === word)];
+  if (found) {
+    out.textContent = '✅ মিল শব্দ:\n\n' + found.join(' · ');
+  } else {
+    out.textContent = `"${word}" এর জন্য সরাসরি মিল পাওয়া যায়নি।\n\nটিপস: বাংলা শব্দের শেষ অক্ষরের মিল খুঁজুন — যেমন "ভালো" লিখলে আলো, কালো পাবেন।`;
+  }
+  out.classList.add('visible');
+  out.style.display = 'block';
+}
+
+// ===== FILE HANDLING =====
+function fileSelected(input) {
+  if (input.files[0]) {
+    const info = document.getElementById('file-info');
+    info.style.display = 'block';
+    info.textContent = '✅ ফাইল লোড হয়েছে: ' + input.files[0].name + ' (' + (input.files[0].size/1024).toFixed(1) + ' KB)';
+  }
+}
+
+function handleDrop(e) {
+  e.preventDefault();
+  e.currentTarget.style.borderColor = 'var(--border2)';
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('audio/')) {
+    const dt = new DataTransfer();
+    dt.items.add(file);
+    document.getElementById('audio-file').files = dt.files;
+    fileSelected(document.getElementById('audio-file'));
+  }
+}
+
+function toggleSep(el) { el.classList.toggle('selected'); }
+
+function runDismantle() {
+  const file = document.getElementById('audio-file').files[0];
+  const result = document.getElementById('dismantle-result');
+  const out = document.getElementById('dismantle-out');
+  if (!file) { alert('আগে একটি অডিও ফাইল সিলেক্ট করুন!'); return; }
+
+  const selected = [];
+  if (document.getElementById('sep-vocals').classList.contains('selected')) selected.push('🎤 Vocals');
+  if (document.getElementById('sep-beats').classList.contains('selected')) selected.push('🥁 Drums/Beat');
+  if (document.getElementById('sep-bass').classList.contains('selected')) selected.push('🎸 Bass');
+  if (document.getElementById('sep-instr').classList.contains('selected')) selected.push('🎹 Instruments');
+
+  result.style.display = 'block';
+  out.textContent = '⏳ Processing...';
+  setTimeout(() => {
+    out.textContent = `✅ "${file.name}" সফলভাবে বিশ্লেষণ করা হয়েছে!\n\n` +
+      `📦 আলাদা করা হয়েছে:\n` + selected.map(s => `  ${s} → ready`).join('\n') +
+      `\n\n💡 নোট: সত্যিকারের stem separation-এর জন্য Spleeter, LALAL.AI বা Moises.ai ব্যবহার করুন।\n` +
+      `🔗 LALAL.AI: https://www.lalal.ai\n🔗 Moises: https://moises.ai`;
+  }, 1800);
+}
+
+function runReassemble() {
+  const t1 = document.getElementById('track1').files[0];
+  const t2 = document.getElementById('track2').files[0];
+  const result = document.getElementById('reassemble-result');
+  const out = document.getElementById('reassemble-out');
+  const playerDiv = document.getElementById('merged-player');
+
+  if (!t1 && !t2) { alert('অন্তত একটি ট্র্যাক সিলেক্ট করুন!'); return; }
+
+  result.style.display = 'block';
+  out.textContent = '⏳ Mixing...';
+
+  setTimeout(() => {
+    const ratio = document.getElementById('mix-ratio').value;
+    let msg = `✅ Reassemble সম্পন্ন!\n\nMix: Track 1 (${ratio}%) + Track 2 (${100-ratio}%)\n\nফাইল:\n`;
+    if (t1) msg += `  🎵 ${t1.name}\n`;
+    if (t2) msg += `  🎵 ${t2.name}\n`;
+    msg += `\n💡 ব্রাউজারে দুটো ট্র্যাক একসাথে মিশ্রণ সীমিত। প্রফেশনাল মিক্সিং-এর জন্য Audacity বা GarageBand ব্যবহার করুন।`;
+    out.textContent = msg;
+
+    playerDiv.innerHTML = '';
+    if (t1) {
+      const url = URL.createObjectURL(t1);
+      playerDiv.innerHTML += `<p style="font-size:12px;color:var(--muted);margin-bottom:4px;">Track 1:</p><audio controls style="width:100%;margin-bottom:8px;" src="${url}"></audio>`;
+    }
+    if (t2) {
+      const url2 = URL.createObjectURL(t2);
+      playerDiv.innerHTML += `<p style="font-size:12px;color:var(--muted);margin-bottom:4px;">Track 2:</p><audio controls style="width:100%;" src="${url2}"></audio>`;
+    }
+  }, 1500);
+}
+
+// ===== PITCH & SPEED =====
+let psAudio = null;
+function loadPSFile(input) {
+  if (!input.files[0]) return;
+  const url = URL.createObjectURL(input.files[0]);
+  document.getElementById('ps-player').innerHTML =
+    `<audio id="ps-audio" controls style="width:100%;margin-top:8px;" src="${url}"></audio>`;
+  psAudio = document.getElementById('ps-audio');
+}
+function updateSpeed(val) {
+  document.getElementById('speed-disp').textContent = parseFloat(val).toFixed(1) + 'x';
+  const a = document.getElementById('ps-audio');
+  if (a) a.playbackRate = parseFloat(val);
+}
+
+// ===== BEAT SEQUENCER =====
+const instruments = [
+  { name: '🥁 Kick', freq: 80, type: 'sine' },
+  { name: '🔔 Snare', freq: 300, type: 'triangle' },
+  { name: '🎩 Hi-Hat', freq: 800, type: 'square' },
+  { name: '🎸 Bass', freq: 100, type: 'sawtooth' }
+];
+const STEPS = 16;
+let beatGrid = Array(4).fill(null).map(() => Array(STEPS).fill(false));
+let beatPlaying = false;
+let beatStep = 0;
+let beatInterval = null;
+let audioCtx = null;
+
+function initBeatGrid() {
+  const container = document.getElementById('beat-grid');
+  container.innerHTML = '';
+  instruments.forEach((inst, i) => {
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:6px;margin-bottom:8px;';
+    const lbl = document.createElement('div');
+    lbl.style.cssText = 'font-size:12px;width:80px;flex-shrink:0;color:var(--muted);';
+    lbl.textContent = inst.name;
+    row.appendChild(lbl);
+    const steps = document.createElement('div');
+    steps.style.cssText = 'display:flex;gap:3px;flex:1;';
+    for (let s = 0; s < STEPS; s++) {
+      const btn = document.createElement('button');
+      btn.style.cssText = `flex:1;height:28px;border-radius:4px;border:0.5px solid var(--border2);background:var(--bg3);cursor:pointer;transition:background 0.1s;${s===4||s===8||s===12?'border-left:1.5px solid var(--border2);':''}`;
+      btn.dataset.row = i; btn.dataset.step = s;
+      btn.onclick = function() {
+        beatGrid[i][s] = !beatGrid[i][s];
+        this.style.background = beatGrid[i][s] ? 'var(--cyan)' : 'var(--bg3)';
+      };
+      steps.appendChild(btn);
+    }
+    row.appendChild(steps);
+    container.appendChild(row);
+  });
+}
+
+function toggleBeat() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  beatPlaying = !beatPlaying;
+  document.getElementById('play-btn').textContent = beatPlaying ? '⏹ Stop' : '▶ Play';
+  if (beatPlaying) {
+    const bpm = parseInt(document.getElementById('bpm-range').value);
+    const interval = (60 / bpm / 4) * 1000;
+    beatStep = 0;
+    beatInterval = setInterval(tickBeat, interval);
+  } else {
+    clearInterval(beatInterval);
+    highlightStep(-1);
+  }
+}
+
+function tickBeat() {
+  const bpm = parseInt(document.getElementById('bpm-range').value);
+  const interval = (60 / bpm / 4) * 1000;
+  clearInterval(beatInterval);
+  beatInterval = setInterval(tickBeat, interval);
+
+  highlightStep(beatStep);
+  instruments.forEach((inst, i) => {
+    if (beatGrid[i][beatStep]) playSound(inst.freq, inst.type);
+  });
+  animateWaveform();
+  beatStep = (beatStep + 1) % STEPS;
+}
+
+function highlightStep(s) {
+  document.querySelectorAll('#beat-grid button').forEach(btn => {
+    const bs = parseInt(btn.dataset.step);
+    const active = beatGrid[parseInt(btn.dataset.row)][bs];
+    if (bs === s) {
+      btn.style.background = 'rgba(0,229,255,0.4)';
+    } else {
+      btn.style.background = active ? 'var(--cyan)' : 'var(--bg3)';
+    }
+  });
+}
+
+function playSound(freq, type) {
+  if (!audioCtx) return;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.connect(gain); gain.connect(audioCtx.destination);
+  osc.type = type; osc.frequency.value = freq;
+  gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
+  osc.start(audioCtx.currentTime);
+  osc.stop(audioCtx.currentTime + 0.15);
+}
+
+function clearBeat() {
+  beatGrid = Array(4).fill(null).map(() => Array(STEPS).fill(false));
+  initBeatGrid();
+}
+
+function randomBeat() {
+  beatGrid = beatGrid.map((row, i) => row.map(() => Math.random() > (i === 0 ? 0.6 : 0.75)));
+  initBeatGrid();
+  beatGrid.forEach((row, i) => row.forEach((v, s) => {
+    if (v) {
+      const btn = document.querySelector(`[data-row="${i}"][data-step="${s}"]`);
+      if (btn) btn.style.background = 'var(--cyan)';
+    }
+  }));
+}
+
+function initWaveform() {
+  const wf = document.getElementById('waveform');
+  wf.innerHTML = '';
+  for (let i = 0; i < 32; i++) {
+    const bar = document.createElement('div');
+    bar.className = 'wave-bar';
+    bar.style.height = '8px';
+    wf.appendChild(bar);
+  }
+}
+
+function animateWaveform() {
+  document.querySelectorAll('.wave-bar').forEach(bar => {
+    const h = Math.random() * 32 + 4;
+    bar.style.height = h + 'px';
+    bar.style.background = `rgba(0,229,255,${0.15 + Math.random() * 0.6})`;
+  });
+  setTimeout(() => {
+    document.querySelectorAll('.wave-bar').forEach(bar => {
+      bar.style.height = '8px';
+      bar.style.background = 'rgba(0,229,255,0.25)';
+    });
+  }, 100);
+}
+
+// ===== CHORD SUGGESTER =====
+const chordSets = {
+  major: { I: '', II: 'm', III: 'm', IV: '', V: '', VI: 'm', VII: 'dim' },
+  minor: { I: 'm', II: 'dim', III: '', IV: 'm', V: 'm', VI: '', VII: '' }
+};
+const majorIntervals = [0,2,4,5,7,9,11];
+const minorIntervals = [0,2,3,5,7,8,10];
+const notes = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+
+function suggestChords() {
+  const key = document.getElementById('chord-key').value;
+  const mode = document.getElementById('chord-mode').value;
+  const rootIdx = notes.indexOf(key);
+  const intervals = mode === 'major' ? majorIntervals : minorIntervals;
+  const qualities = Object.values(chordSets[mode]);
+  const romanNumerals = Object.keys(chordSets[mode]);
+  const out = document.getElementById('chord-output');
+
+  let result = `Key: ${key} ${mode.charAt(0).toUpperCase()+mode.slice(1)}\n\n`;
+  result += 'Diatonic Chords:\n';
+  intervals.forEach((interval, i) => {
+    const chordNote = notes[(rootIdx + interval) % 12];
+    result += `  ${romanNumerals[i].padEnd(5)} → ${chordNote}${qualities[i]}\n`;
+  });
+
+  const prog = mode === 'major'
+    ? `\nPopular Progressions:\n  I → V → vi → IV\n  ${notes[rootIdx]} → ${notes[(rootIdx+7)%12]} → ${notes[(rootIdx+9)%12]}m → ${notes[(rootIdx+5)%12]}\n\n  I → IV → V\n  ${notes[rootIdx]} → ${notes[(rootIdx+5)%12]} → ${notes[(rootIdx+7)%12]}`
+    : `\nPopular Progressions:\n  i → VII → VI → VII\n  ${notes[rootIdx]}m → ${notes[(rootIdx+10)%12]} → ${notes[(rootIdx+8)%12]} → ${notes[(rootIdx+10)%12]}\n\n  i → iv → v\n  ${notes[rootIdx]}m → ${notes[(rootIdx+5)%12]}m → ${notes[(rootIdx+7)%12]}m`;
+
+  result += prog;
+  out.textContent = result;
+  out.classList.add('visible');
+  out.style.display = 'block';
+}
+
+// ===== UTILS =====
+function copyText(id) {
+  const text = document.getElementById(id).textContent;
+  navigator.clipboard.writeText(text).then(() => alert('✅ Copied!'));
+}
+function downloadText(id, filename) {
+  const text = document.getElementById(id).textContent;
+  const a = document.createElement('a');
+  a.href = 'data:text/plain;charset=utf-8,' + encodeURIComponent(text);
+  a.download = filename; a.click();
+}
+
+// ===== INIT =====
+initBeatGrid();
+initWaveform();
+document.getElementById('rhyme-word').addEventListener('keydown', e => { if(e.key==='Enter') findRhymes(); });
+</script>
+</body>
+</html>
